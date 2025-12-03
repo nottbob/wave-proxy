@@ -11,7 +11,7 @@ const server = http.createServer(async (req, res) => {
         "file=multi_1.at_10m.t00z.grib2" +
         "&lev_surface=on" +
         "&var_HTSGW=on" +
-        "&subregion=&leftlon=262.8&rightlon=262.9&toplat=26.15&bottomlat=26.05" +
+        "&leftlon=262.8&rightlon=262.9&toplat=26.15&bottomlat=26.05" +
         "&dir=%2Fmulti_1";
 
       const r = await fetch(url);
@@ -26,8 +26,6 @@ const server = http.createServer(async (req, res) => {
       const dv = new DataView(buf);
 
       let waveM = null;
-
-      // Scan floats for a realistic value
       for (let i = 0; i < dv.byteLength - 4; i += 4) {
         const v = dv.getFloat32(i, false);
         if (v > 0 && v < 20) {
@@ -45,10 +43,10 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(500, { "Content-Type": "application/json" });
       return res.end(JSON.stringify({ error: String(e) }));
     }
+  } else {
+    res.writeHead(404, { "Content-Type": "text/plain" });
+    res.end("Not found");
   }
-
-  res.writeHead(404, { "Content-Type": "text/plain" });
-  res.end("Not found");
 });
 
 server.listen(PORT, () => {
